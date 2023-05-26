@@ -1,10 +1,12 @@
 # Trello Integration System
 
-This repository contains an integration system that connects Trello and the OpenAI ChatGPT API. The system allows you to process tasks from Trello cards, generate subtasks using the ChatGPT API, and update Trello cards with subtask checklists and task progress.
+This repository contains an integration system that connects Trello and the OpenAI ChatGPT API. The system processes tasks from Trello cards, generates subtasks using the ChatGPT API, and updates Trello cards with subtask checklists and task progress.
 
-## Requirements
+## Features
 
-1. Read tasks from Trello cards.
+The Trello Integration System is designed to:
+
+1. Fetch tasks from Trello cards.
 2. Process tasks using the OpenAI ChatGPT API.
 3. Generate subtasks based on the processed tasks.
 4. Create subtask checklists within the corresponding Trello cards.
@@ -12,59 +14,57 @@ This repository contains an integration system that connects Trello and the Open
 
 ## Components
 
-The system consists of the following main components:
+The system consists of three main components:
 
 ### TrelloComponent
 
-- `fetch_tasks()`: Fetches tasks from Trello cards.
-- `create_subtask_checklist(card_id, checklist_name)`: Creates a subtask checklist within a Trello card.
-- `add_subtask_checklist_item(checklist_id, item_name)`: Adds a new item to a checklist.
-- `update_card_description(card_id, description)`: Updates the description of a Trello card.
+This component interacts with the Trello API. It includes methods to fetch tasks from Trello cards, create a subtask checklist within a Trello card, add a new item to a checklist, and update the description of a Trello card.
 
 ### AIComponent
 
-- `process_task(task_description)`: Processes a task using the OpenAI ChatGPT API and returns the processed task.
-- `generate_subtasks(processed_task)`: Generates subtasks based on the processed task and returns a list of subtask names.
+This component interacts with the OpenAI ChatGPT API. It includes methods to process a task and return the processed task, and generate subtasks based on the processed task and return a list of subtask names.
 
 ### IntegrationComponent
 
-- `process_tasks()`: Orchestrates the workflow by fetching tasks, processing them, generating subtasks, and updating Trello cards with the subtask checklists and task progress.
+This component orchestrates the workflow of the application. It fetches tasks, processes them, generates subtasks, and updates Trello cards with the subtask checklists and task progress.
+
+## File Structure
+
+The application is organized into several files:
+
+1. **trello_component.py**: Contains the `TrelloComponent` class.
+2. **ai_component.py**: Contains the `AIComponent` class.
+3. **app.py**: Contains the Flask application and the `IntegrationComponent` class.
+4. **main.py**: The entry point of the application.
 
 ## Getting Started
 
 To get started with the Trello integration system, follow these steps:
 
-1. Install the required dependencies specified in the `requirements.txt` file.
-2. Obtain your Trello API key and token.
-3. Obtain your OpenAI API key.
-4. Set up the necessary configuration variables in the code.
-5. Run the integration system using the provided scripts or by executing the main entry point.
-
-Please refer to the documentation and code comments for more detailed instructions on setting up and using the system.
+1. Clone the repository to your local machine.
+2. Install the required dependencies specified in the `requirements.txt` file.
+3. Obtain your Trello API key and token.
+4. Obtain your OpenAI API key.
+5. Set up the necessary configuration variables in the code.
+6. Run the integration system by executing the `main.py` file.
 
 ## Usage
 
-To use the Trello integration system, you can follow this example:
+Here's an example of how to use the Trello integration system:
 
 ```python
 from trello_component import TrelloComponent
 from ai_component import AIComponent
-from integration_component import IntegrationComponent
+from app import IntegrationComponent
 
 # Instantiate the TrelloComponent
-trello_component = TrelloComponent(api_key='your_api_key', token='your_token')
+trello_component = TrelloComponent(api_key='your_api_key', token='your_token', board_id='your_board_id')
 
 # Instantiate the AIComponent
 ai_component = AIComponent(api_key='your_openai_key')
 
 # Instantiate the IntegrationComponent
-integration_component = IntegrationComponent(
-    trello_component=trello_component,
-    ai_component=ai_component
-)
+integration_component = IntegrationComponent(trello_component, ai_component)
 
 # Process tasks and update Trello cards
 integration_component.process_tasks()
-
-
-
