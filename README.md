@@ -65,3 +65,6 @@ integration_component = IntegrationComponent(
 
 # Process tasks and update Trello cards
 integration_component.process_tasks()
+
+
+

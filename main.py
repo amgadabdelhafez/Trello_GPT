@@ -14,6 +14,35 @@ class TrelloComponent:
         self.api_key = api_key
         self.token = token
         self.board_id = board_id
+            
+    # New method to fetch the checklists of a Trello card
+    def fetch_card_checklists(self, card_id):
+        print(f'Fetching checklists for card {card_id}...')
+        url = f"{self.base_url}/cards/{card_id}/checklists?key={self.api_key}&token={self.token}"
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Raises an HTTPError if the response was unsuccessful
+            checklists = response.json()
+            print(f'Fetched {len(checklists)} checklists.')
+            return checklists
+        except Exception as e:
+            print(f"Failed to fetch card checklists: {e}")
+            return None  # Return None or some default value
+        
+    # New method to update the description of a Trello card
+    def update_card_description(self, card_id, description):
+        print(f'Updating description for card {card_id}...')
+        url = f"{self.base_url}/cards/{card_id}?key={self.api_key}&token={self.token}"
+        payload = {'desc': description}
+        try:
+            response = requests.put(url, json=payload)
+            response.raise_for_status()  # Raises an HTTPError if the response was unsuccessful
+            card = response.json()
+            print(f'Updated card {card["id"]} with new description.')
+            return card
+        except Exception as e:
+            print(f"Failed to update card description: {e}")
+            return None  # Return None or some default value
 
     # Fetch tasks from the Trello board
     def fetch_tasks(self):
@@ -55,6 +84,18 @@ class AIComponent:
         self.api_key = ai_api_key
         self.chatgpt_base_url = 'https://api.openai.com/v1/chat/completions'
 
+    def generate_description(self, task_description):
+        print('Generating task description...')
+        prompt = f"Task: {task_description}\n\n Description:"
+        try:
+            response = self.generate_chat_response(prompt)
+            description = response['choices'][0]['message']['content']
+            print(f'Generated description: {description}')
+            return description
+        except Exception as e:
+            print(f"Failed to generate task description: {e}")
+            return None  # Return None or some default value
+    
     # Process a task description to generate subtasks
     def process_task(self, task_description):
         print('Processing task...')
@@ -92,19 +133,65 @@ class IntegrationComponent:
         self.trello_component = trello_component
         self.ai_component = ai_component
 
-    # Process all tasks from Trello
     def process_tasks(self):
         print('Processing all tasks...')
         tasks = self.trello_component.fetch_tasks()
         processed_tasks = []
         for task in tasks:
             print(f'Processing task: {task["name"]}')
+
+            # Check if the card already has a description
+            if task['desc']:
+                print(f"Card {task['id']} already has a description. Skipping...")
+                continue
+            
+            # Check if the card already has a checklist by AI assistant
+            checklists = self.trello_component.fetch_card_checklists(task['id'])
+            if checklists is None:
+                print(f"Failed to fetch checklists for card {task['id']}")
+                continue  # Skip this task and move on to the next one
+            if any(checklist['name'] == 'Subtasks by AI Assisstant' for checklist in checklists):
+                print(f"Card {task['id']} already has a checklist by AI assistant. Skipping...")
+                continue
+
+            # Generate a description for the task using AI, and update the card's description
+            description = self.ai_component.generate_description(f"{task['name']}: {task['desc']}")
+            if description is None:
+                print(f"Failed to generate a description for task {task['name']}")
+                continue  # Skip this task and move on to the next one
+            updated_card = self.trello_component.update_card_description(task['id'], description)
+            if updated_card is None:
+                print(f"Failed to update the description for card {task['id']}")
+                continue  # Skip this task and move on to the next one
+
+            # Continue processing the task as before
             processed_task = self.ai_component.process_task(f"{task['name']}: {task['desc']}")
             subtasks = self.ai_component.generate_subtasks(processed_task)
             self.trello_component.create_subtask_checklist_items(task['id'], subtasks)
-            processed_tasks.append({'original_task': task, 'processed_task': processed_task, 'subtasks': subtasks})
+            
+            processed_tasks.append({
+                'original_task': task,
+                'processed_task': processed_task,
+                'subtasks': subtasks,
+                'description': description
+            })
+        
         print('Finished processing all tasks.')
         return processed_tasks
+    
+    # # Process all tasks from Trello
+    # def process_tasks(self):
+    #     print('Processing all tasks...')
+    #     tasks = self.trello_component.fetch_tasks()
+    #     processed_tasks = []
+    #     for task in tasks:
+    #         print(f'Processing task: {task["name"]}')
+    #         processed_task = self.ai_component.process_task(f"{task['name']}: {task['desc']}")
+    #         subtasks = self.ai_component.generate_subtasks(processed_task)
+    #         self.trello_component.create_subtask_checklist_items(task['id'], subtasks)
+    #         processed_tasks.append({'original_task': task, 'processed_task': processed_task, 'subtasks': subtasks})
+    #     print('Finished processing all tasks.')
+    #     return processed_tasks
 
 @app.route('/tasks', methods=['GET'])
 def fetch_tasks():
