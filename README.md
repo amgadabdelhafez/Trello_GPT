@@ -32,7 +32,7 @@ This component orchestrates the workflow of the application. It fetches tasks, p
 
 The application is organized into several files:
 
-Trello-GPT 
+Trello-GPT   
 ├── trello_component.py  
 ├── ai_component.py  
 ├── app.py  
