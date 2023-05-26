@@ -1,6 +1,6 @@
-
 # This file contains the TrelloComponent class, which is responsible for interacting with the Trello API.
 import requests
+
 class TrelloComponent:
     def __init__(self, api_key, token, board_id):
         self.base_url = 'https://api.trello.com/1'

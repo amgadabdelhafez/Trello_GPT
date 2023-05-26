@@ -1,4 +1,5 @@
 # This file contains the AIComponent class, which is responsible for interacting with the OpenAI API.
+import requests
 
 class AIComponent:
     def __init__(self, ai_api_key):
