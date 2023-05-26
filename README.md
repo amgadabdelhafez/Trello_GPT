@@ -33,10 +33,10 @@ This component orchestrates the workflow of the application. It fetches tasks, p
 The application is organized into several files:
 
 Trello-GPT 
-├── trello_component.py
-├── ai_component.py
-├── app.py
-└── main.py
+├── trello_component.py  
+├── ai_component.py  
+├── app.py  
+└── main.py  
 
 1. **trello_component.py**: Contains the `TrelloComponent` class.
 2. **ai_component.py**: Contains the `AIComponent` class.
