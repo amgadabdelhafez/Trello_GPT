@@ -1,5 +1,7 @@
 # Front-End Design for Trello_GPT
 
+![Front-End Design Mindmap](https://showme.redstarplugin.com/s/pL2HXZB8)
+
 This document outlines the steps to design a front-end for the Trello_GPT system. A well-designed user interface can greatly enhance the user experience by allowing users to visualize and interact with the system and its outputs.
 
 ![Front-End Design Mindmap](https://showme.redstarplugin.com/s/niBvtkLn)

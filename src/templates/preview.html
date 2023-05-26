@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trello GPT Preview</title>
+</head>
+<body>
+    <h1>AI Generated Content Preview</h1>
+    <h2>Task: {{ task.name }}</h2>
+    <h3>Description:</h3>
+    <p>{{ content.description }}</p>
+    <h3>Subtasks:</h3>
+    <ul>
+        {% for subtask in content.subtasks %}
+        <li>{{ subtask }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
