@@ -10,6 +10,7 @@
             <tr>
                 <th>Task Name</th>
                 <th>Description</th>
+                <th>Sub Tasks</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -18,6 +19,7 @@
             <tr>
                 <td>{{ task.name }}</td>
                 <td>{{ task.description }}</td>
+                <td>{{ task.subtasks }}</td>
                 <td>{{ task.status }}</td>
             </tr>
             {% endfor %}

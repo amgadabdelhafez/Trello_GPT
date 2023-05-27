@@ -8,7 +8,7 @@ class AIComponent:
 
     def generate_description(self, task_description):
         print('Generating task description...')
-        prompt = f"Task: {task_description}\n\n Description:"
+        prompt = f"for the following task, please generate a descriptive description of the task, don't generate subtasks. Task: {task_description}\n\n Description:"
         try:
             response = self.generate_chat_response(prompt)
             description = response['choices'][0]['message']['content']
