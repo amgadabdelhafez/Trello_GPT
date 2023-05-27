@@ -2,28 +2,22 @@
 <html>
 <head>
     <title>Trello GPT Tasks</title>
+    <style>
+        /* CSS styles for the task preview */
+        .task {
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <h1>Trello Tasks</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Task Name</th>
-                <th>Description</th>
-                <th>Sub Tasks</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for task in tasks %}
-            <tr>
-                <td>{{ task.name }}</td>
-                <td>{{ task.description }}</td>
-                <td>{{ task.subtasks }}</td>
-                <td>{{ task.status }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+    <!-- Container for the task preview -->
+    <div id="task-container"></div>
+
+    <p>Click the button below to process tasks.</p>
+    <button id="process-tasks">Process Tasks</button>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

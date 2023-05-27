@@ -15,13 +15,8 @@ integration_component = IntegrationComponent(trello_component, ai_component)
 
 @app.route('/')
 def home():
-    return render_template('index.html')
-
-@app.route('/tasks', methods=['GET'])
-def fetch_tasks():
     tasks = integration_component.process_tasks()
-    # return jsonify(tasks)
-    return render_template('tasks.html', tasks=tasks)
+    return render_template('index.html', tasks=tasks)
 
 @app.route('/preview/<task_id>')
 def preview(task_id):
@@ -29,3 +24,19 @@ def preview(task_id):
     task = {}  # fetch the task using the task_id
     content = {}
     return render_template('preview.html', task=task, content=content)
+
+@app.route('/preview_tasks', methods=['POST'])
+def preview_tasks():
+    tasks = integration_component.process_tasks(preview=True)
+    return jsonify(tasks)
+
+@app.route('/confirm_task/<task_id>', methods=['POST'])
+def confirm_task(task_id):
+    # TODO: Update the Trello card and create checklist items for the confirmed task
+    return jsonify({'message': 'Task confirmed'})
+
+@app.route('/cancel_task/<task_id>', methods=['POST'])
+def cancel_task(task_id):
+    # TODO: Handle the cancellation of the task (if needed)
+    return jsonify({'message': 'Task cancelled'})
+

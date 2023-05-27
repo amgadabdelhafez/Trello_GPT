@@ -4,7 +4,7 @@ class IntegrationComponent:
         self.trello_component = trello_component
         self.ai_component = ai_component
 
-    def process_tasks(self):
+    def process_tasks(self, preview=False):
         print('Processing all tasks...')
         tasks = self.trello_component.fetch_tasks()
         processed_tasks = []
@@ -21,9 +21,9 @@ class IntegrationComponent:
                     # continue  # Skip this task and move on to the next one
                 if any(checklist['name'] == 'Subtasks by AI Assisstant' for checklist in checklists):
                     print(f"Card {task['id']} already has a checklist by AI assistant. Skipping...")
-                    subtasks = ''
+                    subtasks = []
                     for item in checklists[0]['checkItems']:
-                        subtasks += f"{item['name']}"
+                        subtasks.append(item['name'])
                     # continue
 
                     processed_tasks.append({
@@ -44,17 +44,16 @@ class IntegrationComponent:
             if description is None:
                 print(f"Failed to generate a description for task {task['name']}")
                 continue  # Skip this task and move on to the next one
-            updated_card = self.trello_component.update_card_description(task['id'], description)
-
-            if updated_card is None:
-                print(f"Failed to update the description for card {task['id']}")
-                continue  # Skip this task and move on to the next one
+            if not preview:
+                updated_card = self.trello_component.update_card_description(task['id'], description)
+                if updated_card is None:
+                    print(f"Failed to update the description for card {task['id']}")
+                    continue  # Skip this task and move on to the next one
 
             # Continue processing the task as before
             processed_task = self.ai_component.process_task(f"{task['name']}: {task['desc']}")
             subtasks = self.ai_component.generate_subtasks(processed_task)
-            self.trello_component.create_subtask_checklist_items(task['id'], subtasks)
-            
+
             processed_tasks.append({
                 'name': task['name'],
                 'original_task': task,
@@ -62,6 +61,11 @@ class IntegrationComponent:
                 'subtasks': subtasks,
                 'description': description
             })
+
+            if not preview:
+                self.trello_component.create_subtask_checklist_items(task['id'], subtasks)
+
+                return processed_tasks  # Return the processed tasks without saving to Trello
         
         print('Finished processing all tasks.')
         return processed_tasks

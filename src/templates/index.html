@@ -2,9 +2,45 @@
 <html>
 <head>
     <title>Trello GPT</title>
+    <style>
+        .description {
+            width:600px;  /* adjust this value to fit your needs */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .name {
+            width: 100px;  /* adjust this value to fit your needs */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
 </head>
 <body>
     <h1>Welcome to Trello GPT!</h1>
+        <table>
+        <thead>
+            <tr>
+                <th class="name">Task Name</th>
+                <th>Status</th>
+                <th class="description">Description</th>
+                <th>Sub Tasks</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>{{ task.name }}</td>
+                <td>{{ task.status }}</td>
+                <td class="description">{{ task.description }}</td>
+                <td>
+                    {% for subtask in task.subtasks %}
+                        {{ subtask }}<br>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     <p>Click the button below to process tasks.</p>
     <button id="process-tasks">Process Tasks</button>
 
