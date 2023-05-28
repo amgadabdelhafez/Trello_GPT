@@ -1,5 +1,6 @@
 # This file contains the TrelloComponent class, which is responsible for interacting with the Trello API.
 import requests
+import ast
 
 class TrelloComponent:
     def __init__(self, api_key, token, board_id):
@@ -52,7 +53,9 @@ class TrelloComponent:
     # Create checklist items for subtasks in a given card
     def create_subtask_checklist_items(self, card_id, subtasks):
         checklist = self.create_subtask_checklist(card_id, 'Subtasks by AI Assisstant')
-        for subtask in subtasks:
+        list_items = ast.literal_eval(subtasks)
+        list_items = [item for item in list_items if item.strip()]
+        for subtask in list_items:
             self.create_checklist_item(checklist['id'], subtask)
 
     # Create a new checklist in a card
@@ -74,3 +77,18 @@ class TrelloComponent:
         checklist_item = response.json()
         print(f'Created checklist item {checklist_item["id"]}.')
         return checklist_item
+    
+    def get_card(self, card_id):
+        url = f"https://api.trello.com/1/cards/{card_id}"
+        query = {
+            'key': self.api_key,
+            'token': self.token,
+        }
+
+        response = requests.request(
+            "GET",
+            url,
+            params=query
+        )
+
+        return response.json()

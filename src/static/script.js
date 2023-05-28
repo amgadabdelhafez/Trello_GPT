@@ -68,6 +68,28 @@ function displayTasksPreview(tasks) {
 }
 
 function confirmTask(taskId) {
+    // Use the unique ID to select the button
+    var button = document.getElementById('saveButton' + taskId);
+    var description = button.getAttribute('data-description');
+    var subtasks = button.getAttribute('data-subtasks');
+    // Include the AI response in the POST request
+    fetch('/confirm_task/' + taskId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            description: description,
+            subtasks: subtasks,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data); // Handle the response if needed
+    });
+}
+
+function saveTask(taskId) {
     fetch('/confirm_task/' + taskId, {
         method: 'POST'
     })
@@ -77,7 +99,7 @@ function confirmTask(taskId) {
     });
 }
 
-function cancelTask(taskId) {
+function discardTask(taskId) {
     fetch('/cancel_task/' + taskId, {
         method: 'POST'
     })

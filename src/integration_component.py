@@ -1,3 +1,5 @@
+from flask import request, Flask, jsonify, render_template
+import trello_component
 
 class IntegrationComponent:
     def __init__(self, trello_component, ai_component):
@@ -66,7 +68,29 @@ class IntegrationComponent:
                 'status': 'Closed' if task['closed'] else 'Open',
                 'original_task': task,
                 'subtasks': subtasks,
-                'description': description
+                'description': description,
+                'id': task['id']
             })       
         print('Finished processing all tasks.')
         return processed_tasks
+
+    def get_task(self, task_id):
+        # Parse the AI-generated description and subtasks from the request body
+        data = request.get_json()
+        description = data.get('description')
+        subtasks = data.get('subtasks')
+
+        # trello_task = self.trello_component.get_card(task_id)
+
+        # Update the Trello card with the AI-generated description
+        updated_card = self.trello_component.update_card_description(task_id, description)
+
+        if updated_card:
+            # Create checklist items for the AI-generated subtasks
+            self.trello_component.create_subtask_checklist_items(task_id, subtasks)
+
+            # Return success message
+            return jsonify({'message': 'Task confirmed and saved to Trello.'})
+        else:
+            # Return error message if card update failed
+            return jsonify({'message': 'Failed to update Trello card.'}), 500

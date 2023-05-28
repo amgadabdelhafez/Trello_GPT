@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template
+from flask import request, Flask, jsonify, render_template
 from trello_component import TrelloComponent
 from ai_component import AIComponent
 from integration_component import IntegrationComponent
@@ -32,19 +32,6 @@ def confirm_task(task_id):
     # TODO: Update the Trello card and create checklist items for the confirmed task
     # Retrieve the task details based on task_id
     task = integration_component.get_task(task_id)
-
-    # Update the Trello card with the AI-generated description
-    updated_card = trello_component.update_card_description(task['id'], task['description'])
-
-    if updated_card:
-        # Create checklist items for the AI-generated subtasks
-        trello_component.create_subtask_checklist_items(task['id'], task['subtasks'])
-
-        # Return success message
-        return jsonify({'message': 'Task confirmed and saved to Trello.'})
-    else:
-        # Return error message if card update failed
-        return jsonify({'message': 'Failed to update Trello card.'}), 500
 
 @app.route('/cancel_task/<task_id>', methods=['POST'])
 def cancel_task(task_id):

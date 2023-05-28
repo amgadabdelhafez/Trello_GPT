@@ -34,7 +34,8 @@
                 <td>{{ task.status }}</td>
                 <td>
                     {% if task.preview %}
-                        <button onclick="saveTask('{{ task.id }}')">Save</button>
+                    <!-- When you create the Save button, add the AI response as data attributes -->
+                        <button id="saveButton{{task.id}}" onclick="confirmTask('{{ task.id }}')" data-description="{{ task.description }}" data-subtasks="{{ task.subtasks }}">Save</button>
                         <button onclick="discardTask('{{ task.id }}')">Discard</button>
                     {% else %}
                         N/A
@@ -52,26 +53,6 @@
     </table>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
-    <script>
-        function saveTask(taskId) {
-            fetch('/confirm_task/' + taskId, {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data); // Handle the response if needed
-            });
-        }
 
-        function discardTask(taskId) {
-            fetch('/cancel_task/' + taskId, {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data); // Handle the response if needed
-            });
-        }
-    </script>
 </body>
 </html>
