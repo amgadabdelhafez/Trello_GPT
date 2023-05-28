@@ -6,9 +6,9 @@ class AIComponent:
         self.api_key = ai_api_key
         self.chatgpt_base_url = 'https://api.openai.com/v1/chat/completions'
 
-    def generate_description(self, task_description):
+    def generate_description(self, task_name):
         print('Generating task description...')
-        prompt = f"for the following task, please generate a descriptive description of the task, don't generate subtasks. Task: {task_description}\n\n Description:"
+        prompt = f"Please generate a descriptive description for the following task, don't generate subtasks. Task: {task_name}\n\n Description:"
         try:
             response = self.generate_chat_response(prompt)
             description = response['choices'][0]['message']['content']
@@ -28,9 +28,13 @@ class AIComponent:
         return processed_task
 
     # Generate subtasks from a processed task
-    def generate_subtasks(self, processed_task):
+    def generate_subtasks(self, task_name, task_description):
         print('Generating subtasks...')
-        subtasks = [subtask.strip() for subtask in processed_task.split('\n')]
+        prompt = f"Task: {task_name}\n\n Description: {task_description}\n\nSubtasks:"
+        response = self.generate_chat_response(prompt)
+        subtasks_raw = response['choices'][0]['message']['content']
+        print(f'subtasks_raw: {subtasks_raw}')
+        subtasks = [subtask.strip() for subtask in subtasks_raw.split('\n')]
         print(f'Generated {len(subtasks)} subtasks.')
         return subtasks
 

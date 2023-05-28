@@ -23,32 +23,7 @@ function displayTasksPreview(tasks) {
         nameElement.textContent = task.name;
         taskElement.appendChild(nameElement);
 
-        const statusElement = document.createElement('p');
-        statusElement.textContent = task.status;
-        taskElement.appendChild(statusElement);
-
-        const previewElement = document.createElement('p');
-        if (task.preview) {
-            const confirmButton = document.createElement('button');
-            confirmButton.textContent = 'Confirm';
-            confirmButton.addEventListener('click', function() {
-                confirmTask(task.id);
-            });
-            previewElement.appendChild(confirmButton);
-
-            const cancelButton = document.createElement('button');
-            cancelButton.textContent = 'Cancel';
-            cancelButton.addEventListener('click', function() {
-                cancelTask(task.id);
-            });
-            previewElement.appendChild(cancelButton);
-        } else {
-            previewElement.textContent = 'N/A';
-        }
-        taskElement.appendChild(previewElement);
-
         const descriptionElement = document.createElement('p');
-        descriptionElement.className = 'description';
         descriptionElement.textContent = task.description;
         taskElement.appendChild(descriptionElement);
 
@@ -63,6 +38,20 @@ function displayTasksPreview(tasks) {
         });
         taskElement.appendChild(subtasksElement);
 
+        const confirmButton = document.createElement('button');
+        confirmButton.textContent = 'Confirm';
+        confirmButton.addEventListener('click', function() {
+            confirmTask(task.id);
+        });
+        taskElement.appendChild(confirmButton);
+
+        const cancelButton = document.createElement('button');
+        cancelButton.textContent = 'Cancel';
+        cancelButton.addEventListener('click', function() {
+            cancelTask(task.id);
+        });
+        taskElement.appendChild(cancelButton);
+
         taskContainer.appendChild(taskElement);
     });
 }
@@ -73,7 +62,8 @@ function confirmTask(taskId) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data); // Handle the response if needed
+        // Handle confirmation response if needed
+        console.log(data);
     });
 }
 
@@ -83,6 +73,7 @@ function cancelTask(taskId) {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data); // Handle the response if needed
+        // Handle cancellation response if needed
+        console.log(data);
     });
 }

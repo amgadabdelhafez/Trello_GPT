@@ -3,13 +3,13 @@
 <head>
     <title>Trello GPT</title>
     <style>
-        .description {
-            width:600px;  /* adjust this value to fit your needs */
+        .name {
+            width: 200px;  /* adjust this value to fit your needs */
             overflow: hidden;
             text-overflow: ellipsis;
         }
-        .name {
-            width: 100px;  /* adjust this value to fit your needs */
+        .description {
+            width: 600px;  /* adjust this value to fit your needs */
             overflow: hidden;
             text-overflow: ellipsis;
         }
@@ -17,11 +17,12 @@
 </head>
 <body>
     <h1>Welcome to Trello GPT!</h1>
-        <table>
+    <table>
         <thead>
             <tr>
                 <th class="name">Task Name</th>
                 <th>Status</th>
+                <th>Preview</th>
                 <th class="description">Description</th>
                 <th>Sub Tasks</th>
             </tr>
@@ -29,8 +30,16 @@
         <tbody>
             {% for task in tasks %}
             <tr>
-                <td>{{ task.name }}</td>
+                <td class="name">{{ task.name }}</td>
                 <td>{{ task.status }}</td>
+                <td>
+                    {% if task.preview %}
+                        <button onclick="saveTask('{{ task.id }}')">Save</button>
+                        <button onclick="discardTask('{{ task.id }}')">Discard</button>
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
                 <td class="description">{{ task.description }}</td>
                 <td>
                     {% for subtask in task.subtasks %}
@@ -41,9 +50,28 @@
             {% endfor %}
         </tbody>
     </table>
-    <p>Click the button below to process tasks.</p>
-    <button id="process-tasks">Process Tasks</button>
 
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        function saveTask(taskId) {
+            fetch('/confirm_task/' + taskId, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data); // Handle the response if needed
+            });
+        }
+
+        function discardTask(taskId) {
+            fetch('/cancel_task/' + taskId, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data); // Handle the response if needed
+            });
+        }
+    </script>
 </body>
 </html>

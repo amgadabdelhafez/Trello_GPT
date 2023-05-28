@@ -8,6 +8,16 @@ class TrelloComponent:
         self.token = token
         self.board_id = board_id
             
+
+    # Fetch tasks from the Trello board
+    def fetch_tasks(self):
+        print('Fetching tasks from Trello...')
+        url = f"{self.base_url}/boards/{self.board_id}/cards?key={self.api_key}&token={self.token}"
+        response = requests.get(url)
+        tasks = response.json()
+        print(f'Fetched {len(tasks)} tasks.')
+        return tasks
+
     # New method to fetch the checklists of a Trello card
     def fetch_card_checklists(self, card_id):
         print(f'Fetching checklists for card {card_id}...')
@@ -16,7 +26,8 @@ class TrelloComponent:
             response = requests.get(url)
             response.raise_for_status()  # Raises an HTTPError if the response was unsuccessful
             checklists = response.json()
-            print(f'Fetched {len(checklists)} checklists.')
+            items = checklists[0]['checkItems']
+            print(f'Fetched {len(checklists)} checklists, and {len(items)} checklist items.')
             return checklists
         except Exception as e:
             print(f"Failed to fetch card checklists: {e}")
@@ -37,14 +48,6 @@ class TrelloComponent:
             print(f"Failed to update card description: {e}")
             return None  # Return None or some default value
 
-    # Fetch tasks from the Trello board
-    def fetch_tasks(self):
-        print('Fetching tasks from Trello...')
-        url = f"{self.base_url}/boards/{self.board_id}/cards?key={self.api_key}&token={self.token}"
-        response = requests.get(url)
-        tasks = response.json()
-        print(f'Fetched {len(tasks)} tasks.')
-        return tasks
 
     # Create checklist items for subtasks in a given card
     def create_subtask_checklist_items(self, card_id, subtasks):

@@ -4,8 +4,15 @@ class IntegrationComponent:
         self.trello_component = trello_component
         self.ai_component = ai_component
 
-    def process_tasks(self, preview=False):
-        print('Processing all tasks...')
+    def process_tasks(self, preview=True):
+        # go through all tasks
+        # if new task, has no description or checklist items, then we get description and checklist from AI, then preview to user, but not save to trello yet
+        # user preview, either save or discard
+        # if save, then update the description and checklist items in trello
+        # if discard, then do nothing and move on to the next task
+        
+        print(f'Processing all tasks, Preview: {preview}')
+
         tasks = self.trello_component.fetch_tasks()
         processed_tasks = []
         for task in tasks:
@@ -14,58 +21,52 @@ class IntegrationComponent:
             # Check if the card already has a description
             if task['desc']:
                 description = task['desc']
+                print(f'task has description: {description}')
+                has_description = True
                 # Check if the card already has a checklist by AI assistant
                 checklists = self.trello_component.fetch_card_checklists(task['id'])
-                if checklists is None:
-                    print(f"Failed to fetch checklists for card {task['id']}")
-                    # continue  # Skip this task and move on to the next one
-                if any(checklist['name'] == 'Subtasks by AI Assisstant' for checklist in checklists):
-                    print(f"Card {task['id']} already has a checklist by AI assistant. Skipping...")
+                if checklists is not None and any(checklist['name'] == 'Subtasks by AI Assisstant' for checklist in checklists):
+                    print(f"Task '{task['name']}' already has a checklist by AI assistant. Loading...")
+                    has_checklist = True
                     subtasks = []
                     for item in checklists[0]['checkItems']:
                         subtasks.append(item['name'])
-                    # continue
+     
+            else:
+                # if the card doesn't have a description, generate a description for the task using AI
+                # if preview is true, then update the card's description
+                description = self.ai_component.generate_description(f"{task['name']}")
 
-                    processed_tasks.append({
-                        'name': task['name'],
-                        'status': 'Closed' if task['closed'] else 'Open',
-                        'original_task': task,
-                        'subtasks': subtasks,
-                        'description': task['desc']
-                    })
-                            
-                print(f"Card {task['id']} already has a description. Skipping...")
-                continue
-            
-
-            # Generate a description for the task using AI, and update the card's description
-            description = self.ai_component.generate_description(f"{task['name']}: {task['desc']}")
-
-            if description is None:
-                print(f"Failed to generate a description for task {task['name']}")
-                continue  # Skip this task and move on to the next one
-            if not preview:
-                updated_card = self.trello_component.update_card_description(task['id'], description)
-                if updated_card is None:
-                    print(f"Failed to update the description for card {task['id']}")
+                if description is None:
+                    print(f"Failed to generate a description for task {task['name']}")
                     continue  # Skip this task and move on to the next one
+                has_description = True
 
-            # Continue processing the task as before
-            processed_task = self.ai_component.process_task(f"{task['name']}: {task['desc']}")
-            subtasks = self.ai_component.generate_subtasks(processed_task)
+                subtasks = self.ai_component.generate_subtasks(task['name'], task['desc'])
+                if subtasks is None:
+                    print(f"Failed to generate subtasks for task {task['name']}")
+                    continue  # Skip this task and move on to the next one
+                has_checklist = True
+
+                if not preview:
+                    updated_card = self.trello_component.update_card_description(task['id'], description)
+                    self.trello_component.create_subtask_checklist_items(task['id'], subtasks)
+
+                    if updated_card is None:
+                        print(f"Failed to update the description for card {task['id']}")
+                        continue  # Skip this task and move on to the next one
+
+                    return processed_tasks  # Return the processed tasks without saving to Trello
 
             processed_tasks.append({
                 'name': task['name'],
+                'preview': preview,
+                'has_description': has_description,
+                'has_checklist': has_checklist,
+                'status': 'Closed' if task['closed'] else 'Open',
                 'original_task': task,
-                'processed_task': processed_task,
                 'subtasks': subtasks,
                 'description': description
-            })
-
-            if not preview:
-                self.trello_component.create_subtask_checklist_items(task['id'], subtasks)
-
-                return processed_tasks  # Return the processed tasks without saving to Trello
-        
+            })       
         print('Finished processing all tasks.')
         return processed_tasks
