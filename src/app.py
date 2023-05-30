@@ -1,13 +1,18 @@
-from flask import request, Flask, jsonify, render_template
+import os
+from flask import Flask, jsonify, render_template
+from integration_component import IntegrationComponent
 from trello_component import TrelloComponent
 from ai_component import AIComponent
-from integration_component import IntegrationComponent
-import os
 
 app = Flask(__name__)
 
-trello_component = TrelloComponent(api_key=os.getenv('TRELLO_API_KEY'), token=os.getenv('TRELLO_TOKEN'), board_id=os.getenv('TRELLO_BOARD_ID'))
-ai_component = AIComponent(ai_api_key=os.getenv('OPENAI_API_KEY'))
+api_key = os.getenv('TRELLO_API_KEY')
+token = os.getenv('TRELLO_TOKEN')
+board_id = os.getenv('TRELLO_BOARD_ID')
+ai_api_key = os.getenv('OPENAI_API_KEY')
+
+trello_component = TrelloComponent(api_key=api_key, token=token, board_id=board_id)
+ai_component = AIComponent(ai_api_key=ai_api_key)
 integration_component = IntegrationComponent(trello_component, ai_component)
 
 @app.route('/')
@@ -30,16 +35,13 @@ def preview_tasks():
 @app.route('/confirm_task/<task_id>', methods=['POST'])
 def confirm_task(task_id):
     # TODO: Update the Trello card and create checklist items for the confirmed task
-    # Retrieve the task details based on task_id
     task = integration_component.get_task(task_id)
+    return jsonify({'message': 'Task confirmed.'})
 
 @app.route('/cancel_task/<task_id>', methods=['POST'])
 def cancel_task(task_id):
     # TODO: Handle the cancellation of the task (if needed)
-    # Retrieve the task details based on task_id
     task = integration_component.get_task(task_id)
-
-    # Return success message
     return jsonify({'message': 'Task cancelled.'})
 
 if __name__ == '__main__':

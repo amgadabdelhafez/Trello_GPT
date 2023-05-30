@@ -3,15 +3,16 @@
 <head>
     <title>Trello GPT</title>
     <style>
-        .name {
-            width: 200px;  /* adjust this value to fit your needs */
+        /* Replaced .name and .description classes with a single .task-cell class */
+        .task-cell {
+            /* Added max-width to limit the size of the cells */
+            max-width: 200px;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-        .description {
-            width: 600px;  /* adjust this value to fit your needs */
-            overflow: hidden;
-            text-overflow: ellipsis;
+            /* Added padding to give some breathing room for the cell content */
+            padding: 5px;
+            /* Changed box-sizing to border-box to include padding in the cell width calculation */
+            box-sizing: border-box;
         }
     </style>
 </head>
@@ -20,17 +21,19 @@
     <table>
         <thead>
             <tr>
-                <th class="name">Task Name</th>
+                <!-- Replaced .name and .description classes with the new .task-cell class -->
+                <th class="task-cell">Task Name</th>
                 <th>Status</th>
                 <th>Preview</th>
-                <th class="description">Description</th>
+                <th class="task-cell">Description</th>
                 <th>Sub Tasks</th>
             </tr>
         </thead>
         <tbody>
             {% for task in tasks %}
             <tr>
-                <td class="name">{{ task.name }}</td>
+                <!-- Replaced .name and .description classes with the new .task-cell class -->
+                <td class="task-cell">{{ task.name }}</td>
                 <td>{{ task.status }}</td>
                 <td>
                     {% if task.preview %}
@@ -41,7 +44,8 @@
                         N/A
                     {% endif %}
                 </td>
-                <td class="description">{{ task.description }}</td>
+                <!-- Replaced .description class with the new .task-cell class -->
+                <td class="task-cell">{{ task.description }}</td>
                 <td>
                     {% for subtask in task.subtasks %}
                         {{ subtask }}<br>

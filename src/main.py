@@ -1,7 +1,6 @@
-# This file is the entry point of the application.
-# It imports and runs the Flask application from app.py.
-
+"""This file is the entry point of the Flask application."""
 from app import app
 
 if __name__ == '__main__':
+    """Runs the flask application."""
     app.run(debug=True)
